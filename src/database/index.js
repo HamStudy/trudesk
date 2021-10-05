@@ -15,6 +15,17 @@
 var nconf = require('nconf')
 var mongoose = require('mongoose')
 var winston = require('winston')
+var fs = require('fs')
+
+function loadFile (fname) {
+  try {
+    var contents = fs.readFileSync(fname).toString('utf8')
+    return contents
+  } catch (err) {
+    winston.warn(err.message)
+    return null
+  }
+}
 
 var db = {}
 var mongoConnectionUri = {
@@ -23,7 +34,9 @@ var mongoConnectionUri = {
   username: process.env.TD_MONGODB_USERNAME || nconf.get('mongo:username'),
   password: process.env.TD_MONGODB_PASSWORD || nconf.get('mongo:password'),
   database: process.env.TD_MONGODB_DATABASE || nconf.get('mongo:database'),
-  shard: process.env.TD_MONGODB_SHARD || nconf.get('mongo:shard')
+  shard: process.env.TD_MONGODB_SHARD || nconf.get('mongo:shard'),
+  sslCA: process.env.TD_SSLCA || nconf.get('mongo:sslca'),
+  sslPem: process.env.TD_SSLPEM || nconf.get('mongo:sslpem')
 }
 
 var CONNECTION_URI = ''
@@ -75,6 +88,15 @@ module.exports.init = function (callback, connectionString, opts) {
 
   if (db.connection) {
     return callback(null, db)
+  }
+
+  if (mongoConnectionUri.sslCA) {
+    options.ssl = true
+    options.sslCA = loadFile(mongoConnectionUri.sslCA)
+  }
+  if (mongoConnectionUri.sslPem) {
+    options.ssl = true
+    options.sslCert = options.sslKey = loadFile(mongoConnectionUri.sslPem)
   }
 
   global.CONNECTION_URI = CONNECTION_URI
