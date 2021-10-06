@@ -137,7 +137,7 @@ installController.install = function (req, res) {
   var password = data['mongo[password]']
 
   // ElasticSearch
-  var eEnabled = data['elastic[enable]']
+  var eEnabled = data['elastic[enable]'] || false
   if (typeof eEnabled === 'string') eEnabled = eEnabled.toLowerCase() === 'true'
 
   var eHost = data['elastic[host]']
