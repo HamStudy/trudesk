@@ -32,6 +32,8 @@ nconf.argv().env()
 global.env = process.env.NODE_ENV || 'development'
 // global.env = process.env.NODE_ENV || 'production';
 
+var defaultLevel = global.env === 'production' ? 'info' : 'verbose';
+
 winston.setLevels(winston.config.cli.levels)
 winston.remove(winston.transports.Console)
 winston.add(winston.transports.Console, {
@@ -50,7 +52,7 @@ winston.add(winston.transports.Console, {
       ']'
     )
   },
-  level: global.env === 'production' ? 'info' : 'verbose'
+  level: process.env.TRUDESK_LOGLEVEL || defaultLevel,
 })
 
 winston.add(winston.transports.File, {
