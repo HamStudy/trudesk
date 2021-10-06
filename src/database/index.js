@@ -35,12 +35,17 @@ var mongoConnectionUri = {
   password: process.env.TD_MONGODB_PASSWORD || nconf.get('mongo:password'),
   database: process.env.TD_MONGODB_DATABASE || nconf.get('mongo:database'),
   shard: process.env.TD_MONGODB_SHARD || nconf.get('mongo:shard'),
+  uri: process.env.TD_MONGODB_URI || nconf.get('mongo:uri'),
   sslCA: process.env.TD_SSLCA || nconf.get('mongo:sslca'),
   sslPem: process.env.TD_SSLPEM || nconf.get('mongo:sslpem')
 }
 
 var CONNECTION_URI = ''
-if (!mongoConnectionUri.username) {
+if (mongoConnectionUri.uri) {
+  // Connection URI should always be the preferred way -- it's the most flexible
+  CONNECTION_URI = mongoConnectionUri.uri;
+  
+} else if (!mongoConnectionUri.username) {
   CONNECTION_URI =
     'mongodb://' + mongoConnectionUri.server + ':' + mongoConnectionUri.port + '/' + mongoConnectionUri.database
   if (mongoConnectionUri.shard === true)
