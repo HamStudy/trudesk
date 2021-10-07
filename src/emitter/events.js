@@ -36,6 +36,8 @@ var notifications = require('../notifications') // Load Push Events
 ;(function () {
   notifications.init(emitter)
 
+  require('../../plugins/discord-notify');
+
   emitter.on('ticket:created', function (data) {
     var ticketObj = data.ticket
     var hostname = data.hostname

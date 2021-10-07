@@ -37,8 +37,9 @@ installController.elastictest = function (req, res) {
   var data = req.body
   var CONNECTION_URI = data.host + ':' + data.port
 
+  var env = Object.assign({}, process.env, { FORK: 1, NODE_ENV: global.env, ELASTICSEARCH_URI: CONNECTION_URI })
   var child = require('child_process').fork(path.join(__dirname, '../../src/install/elasticsearchtest'), {
-    env: { FORK: 1, NODE_ENV: global.env, ELASTICSEARCH_URI: CONNECTION_URI }
+    env: env
   })
   global.forks.push({ name: 'elastictest', fork: child })
 
@@ -61,8 +62,9 @@ installController.mongotest = function (req, res) {
   if (data.port === '---')
     CONNECTION_URI = 'mongodb+srv://' + data.username + ':' + dbPassword + '@' + data.host + '/' + data.database
 
+  var env = Object.assign({}, process.env, { FORK: 1, NODE_ENV: global.env, MONGOTESTURI: CONNECTION_URI })
   var child = require('child_process').fork(path.join(__dirname, '../../src/install/mongotest'), {
-    env: { FORK: 1, NODE_ENV: global.env, MONGOTESTURI: CONNECTION_URI }
+    env: env
   })
 
   global.forks.push({ name: 'mongotest', fork: child })

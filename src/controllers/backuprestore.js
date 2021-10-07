@@ -68,8 +68,9 @@ backupRestore.getBackups = function (req, res) {
 
 backupRestore.runBackup = function (req, res) {
   var database = require('../database')
+  var env = Object.assign({}, process.env, { FORK: 1, NODE_ENV: global.env, MONGOURI: database.connectionuri, PATH: process.env.PATH });
   var child = require('child_process').fork(path.join(__dirname, '../../src/backup/backup'), {
-    env: { FORK: 1, NODE_ENV: global.env, MONGOURI: database.connectionuri, PATH: process.env.PATH }
+    env: env
   })
   global.forks.push({ name: 'backup', fork: child })
 
@@ -134,14 +135,15 @@ backupRestore.restoreBackup = function (req, res) {
   //     return res.json({success: true});
   // });
 
+  var env = Object.assign({}, process.env, {
+    FORK: 1,
+    NODE_ENV: global.env,
+    MONGOURI: database.connectionuri,
+    FILE: file,
+    PATH: process.env.PATH
+  });
   var child = require('child_process').fork(path.join(__dirname, '../../src/backup/restore'), {
-    env: {
-      FORK: 1,
-      NODE_ENV: global.env,
-      MONGOURI: database.connectionuri,
-      FILE: file,
-      PATH: process.env.PATH
-    }
+    env: env
   })
   global.forks.push({ name: 'restore', fork: child })
 
